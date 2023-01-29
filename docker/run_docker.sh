@@ -10,4 +10,4 @@ docker run \
     --name carla_cyber_0.9.13 \
     -v /usr/lib/nvidia:/usr/lib/nvidia \
     -v /usr/lib32/nvidia:/usr/lib32/nvidia \
-    carla_cyber:0.9.13
+    carla_cyber:v1

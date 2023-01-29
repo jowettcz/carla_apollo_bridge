@@ -71,6 +71,7 @@ class EgoVehicle(Vehicle):
         self.vehicle_loc_set = False
 
         self._vehicle_control_applied_callback = vehicle_control_applied_callback
+        sys_name = "/apollo" # sys_name = "/apollo"
 
         self.vehicle_chassis_writer = node.new_writer(
             "/apollo/canbus/chassis",
@@ -353,16 +354,19 @@ class EgoVehicle(Vehicle):
         :return:
         """
         if manual_override == self.vehicle_control_override:
-            vehicle_control = VehicleControl()
-            vehicle_control.throttle = cyber_vehicle_control.throttle / 100.0
-            vehicle_control.brake = cyber_vehicle_control.brake / 100.0
-            rate = cyber_vehicle_control.steering_rate / 100.0
-            vehicle_control.steer = -cyber_vehicle_control.steering_target / 100.0
-            self.node.loginfo("rate is {}, steer is {}".format(rate, -vehicle_control.steer))
-            vehicle_control.hand_brake = cyber_vehicle_control.parking_brake
-            vehicle_control.reverse = cyber_vehicle_control.gear_location == Chassis.GearPosition.GEAR_REVERSE
-            self.carla_actor.apply_control(vehicle_control)
-            self._vehicle_control_applied_callback(self.get_id())
+            # self.node.loginfo("!!!ego vehicle should not be used as mannual control.")
+            pass
+            # vehicle_control = VehicleControl()
+            # vehicle_control.throttle = cyber_vehicle_control.throttle / 100.0
+            # vehicle_control.brake = cyber_vehicle_control.brake / 100.0
+            # rate = cyber_vehicle_control.steering_rate / 100.0
+            # vehicle_control.steer = -cyber_vehicle_control.steering_target / 100.0
+            # self.node.loginfo("rate is {}, steer is {}".format(rate, -vehicle_control.steer))
+            # vehicle_control.hand_brake = cyber_vehicle_control.parking_brake
+            # vehicle_control.reverse = cyber_vehicle_control.gear_location == Chassis.GearPosition.GEAR_REVERSE
+            # self.carla_actor.apply_control(vehicle_control)
+            # self._vehicle_control_applied_callback(self.get_id())
+
 
     def enable_autopilot_updated(self, enable_auto_pilot):
         """

@@ -24,6 +24,7 @@ import json
 import math
 import os
 
+import carla
 from transforms3d.euler import euler2quat
 
 import cyber_compatibility as cybercomp
@@ -41,6 +42,7 @@ from cyber.carla_bridge.carla_proto.proto.carla_destroy_object_pb2 import (
 )
 
 from modules.localization.proto.pose_pb2 import Pose
+
 
 # ==============================================================================
 # -- CarlaSpawnObjects ------------------------------------------------------------
@@ -68,10 +70,19 @@ class CarlaSpawnObjects(CompatibleNode):
         self.spawn_object_service = self.new_client("/carla/spawn_object", SpawnObjectRequest, SpawnObjectResponse)
         self.destroy_object_service = self.new_client("/carla/destroy_object", DestroyObjectRequest, DestroyObjectResponse)
 
+    def set_ego_vehicle_as_autopilot(self, ego_vehicle_id):
+        # Create client and connected to the server
+        client = carla.Client("172.17.0.1", 2000)
+        client.set_timeout(30.0)
+        world = client.get_world()
+        ego_vehicle = world.get_actor(ego_vehicle_id)
+        ego_vehicle.set_autopilot(True)
+
     def spawn_object(self, spawn_object_request):
         response_id = -1
         response = self.call_service(self.spawn_object_service, spawn_object_request)
         response_id = response.id
+        
         if response_id != -1:
             self.loginfo("Object (type='{}', id='{}') spawned successfully as {}.".format(
                 spawn_object_request.type, spawn_object_request.id, response_id))
@@ -79,6 +90,7 @@ class CarlaSpawnObjects(CompatibleNode):
             self.logwarn("Error while spawning object (type='{}', id='{}').".format(
                 spawn_object_request.type, spawn_object_request.id))
             raise RuntimeError(response.error_string)
+
         return response_id
 
     def spawn_objects(self):
@@ -194,7 +206,11 @@ class CarlaSpawnObjects(CompatibleNode):
                     if response_id != -1:
                         player_spawned = True
                         self.players.append(response_id)
-                        # Set up the sensors
+
+                        if spawn_object_request.id == "ego_vehicle":
+                            self.set_ego_vehicle_as_autopilot(response_id)
+                            # pass
+                        #Set up the sensors
                         try:
                             self.setup_sensors(vehicle["sensors"], response_id)
                         except KeyError:

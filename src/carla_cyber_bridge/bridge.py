@@ -11,50 +11,47 @@ Rosbridge class:
 Class that handle communication between CARLA and Cyber
 """
 
-import sys
-import time
-
-sys.path.append("../")
-
-import os
-import pkg_resources
-try:
-    import queue
-except ImportError:
-    import Queue as queue
-import sys
-from distutils.version import LooseVersion
-from threading import Thread, Lock, Event
-import yaml
-
-import carla
-
-import cyber_compatibility as cybercomp
-from cyber_compatibility.node import CompatibleNode
-
-from carla_cyber_bridge.actor import Actor
-from carla_cyber_bridge.actor_factory import ActorFactory
-from carla_cyber_bridge.carla_status_writer import CarlaStatusWriter
-# from carla_cyber_bridge.debug_helper import DebugHelper
-from carla_cyber_bridge.ego_vehicle import EgoVehicle
-from carla_cyber_bridge.world_info import WorldInfo
-
-from cyber_py import cyber
-from cyber.carla_bridge.carla_proto.proto.carla_clock_pb2 import Time, Clock
-from cyber.carla_bridge.carla_proto.proto.carla_control_pb2 import CarlaControl
-from cyber.carla_bridge.carla_proto.proto.carla_spawn_object_pb2 import (
-    SpawnObjectRequest,
-    SpawnObjectResponse
+from cyber.carla_bridge.carla_proto.proto.carla_weather_parameters_pb2 import CarlaWeatherParameters
+from cyber.carla_bridge.carla_proto.proto.carla_get_blueprints_pb2 import (
+    GetBlueprintsRequest,
+    GetBlueprintsResponse
 )
 from cyber.carla_bridge.carla_proto.proto.carla_destroy_object_pb2 import (
     DestroyObjectRequest,
     DestroyObjectResponse
 )
-from cyber.carla_bridge.carla_proto.proto.carla_get_blueprints_pb2 import (
-    GetBlueprintsRequest,
-    GetBlueprintsResponse
+from cyber.carla_bridge.carla_proto.proto.carla_spawn_object_pb2 import (
+    SpawnObjectRequest,
+    SpawnObjectResponse
 )
-from cyber.carla_bridge.carla_proto.proto.carla_weather_parameters_pb2 import CarlaWeatherParameters
+from cyber.carla_bridge.carla_proto.proto.carla_control_pb2 import CarlaControl
+from cyber.carla_bridge.carla_proto.proto.carla_clock_pb2 import Time, Clock
+from cyber_py import cyber
+from carla_cyber_bridge.world_info import WorldInfo
+from carla_cyber_bridge.ego_vehicle import EgoVehicle
+from carla_cyber_bridge.carla_status_writer import CarlaStatusWriter
+from carla_cyber_bridge.actor_factory import ActorFactory
+from carla_cyber_bridge.actor import Actor
+from cyber_compatibility.node import CompatibleNode
+import cyber_compatibility as cybercomp
+import carla
+import yaml
+from threading import Thread, Lock, Event
+from distutils.version import LooseVersion
+import pkg_resources
+import os
+import sys
+import time
+
+sys.path.append("../")
+
+try:
+    import queue
+except ImportError:
+    import Queue as queue
+
+
+# from carla_cyber_bridge.debug_helper import DebugHelper
 
 
 class CarlaCyberBridge(CompatibleNode):
@@ -112,7 +109,8 @@ class CarlaCyberBridge(CompatibleNode):
 
         # active sync mode in the cyber bridge only if CARLA world is configured in sync mode and
         # passive mode is not enabled.
-        self.sync_mode = self.carla_settings.synchronous_mode and not self.parameters["passive"]
+        self.sync_mode = self.carla_settings.synchronous_mode and not self.parameters[
+            "passive"]
         if self.carla_settings.synchronous_mode and self.parameters["passive"]:
             self.loginfo(
                 "Passive mode is enabled and CARLA world is configured in synchronous mode. This configuration requires another client ticking the CARLA world.")
@@ -197,7 +195,8 @@ class CarlaCyberBridge(CompatibleNode):
                 self._registered_actors.append(id_)
                 response.id = id_
             except Exception as e:
-                self.logwarn("Error spawning object '{}': {}".format(req.type, e))
+                self.logwarn(
+                    "Error spawning object '{}': {}".format(req.type, e))
                 response.id = -1
                 response.error_string = str(e)
         else:
@@ -223,7 +222,8 @@ class CarlaCyberBridge(CompatibleNode):
 
         response.blueprints = [
             bp.id for bp in self.carla_world.get_blueprint_library().filter(bp_filter)]
-        response.blueprints.extend(self.actor_factory.get_pseudo_sensor_types())
+        response.blueprints.extend(
+            self.actor_factory.get_pseudo_sensor_types())
         response.blueprints.sort()
         return response
 
@@ -280,7 +280,10 @@ class CarlaCyberBridge(CompatibleNode):
         execution loop for synchronous mode
         """
         while not self.shutdown.is_set():
+            # t1 = time.time()
             self.process_run_state()
+            # t2 = time.time()
+            # print("1. process_run_state cost               {} s".format(t2-t1))
             if self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
                 # fill list of available ego vehicles
                 self._expected_ego_vehicle_control_command_ids = []
@@ -289,9 +292,10 @@ class CarlaCyberBridge(CompatibleNode):
                         if isinstance(actor, EgoVehicle):
                             self._expected_ego_vehicle_control_command_ids.append(
                                 actor_id)
-                            self.loginfo("actor_id is {}".format(actor_id))
-
+                            self.loginfo("set {} as expected_ego_vehicle_control_commands_id".format(actor_id))
             frame = self.carla_world.tick()
+            # t3 = time.time()
+            # print("2. carla_world.tick               {} s".format(t3-t2))
 
             world_snapshot = self.carla_world.get_snapshot()
 
@@ -303,6 +307,9 @@ class CarlaCyberBridge(CompatibleNode):
             # self.logdebug("Waiting for sensor data finished.")
             self.actor_factory.update_available_objects()
 
+            t4 = time.time()
+            # print("3. world snap and update                {} s".format(t4-t3))
+
             if self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
                 # wait for all ego vehicles to send a vehicle control command
                 if self._expected_ego_vehicle_control_command_ids:
@@ -311,6 +318,8 @@ class CarlaCyberBridge(CompatibleNode):
                                      "Missing command from actor ids {}".format(CarlaCyberBridge.VEHICLE_CONTROL_TIMEOUT,
                                                                                 self._expected_ego_vehicle_control_command_ids))
                     self._all_vehicle_control_commands_received.clear()
+            t5 = time.time()
+            # print("4. wait for control command              {} s".format(t5-t4))
 
     def _carla_time_tick(self, carla_snapshot):
         """
@@ -327,12 +336,13 @@ class CarlaCyberBridge(CompatibleNode):
         :return:
         """
         if cybercomp.ok():
-            if self.timestamp_last_run < carla_snapshot.timestamp.elapsed_seconds:
+            if carla_snapshot.timestamp.elapsed_seconds < carla_snapshot.timestamp.elapsed_seconds:
                 self.timestamp_last_run = carla_snapshot.timestamp.elapsed_seconds
                 self.update_clock(carla_snapshot.timestamp)
                 self.status_writer.set_frame(carla_snapshot.frame)
                 self._update(carla_snapshot.frame,
                              carla_snapshot.timestamp.elapsed_seconds)
+                print("carla tick time---------------- {}".format(carla_snapshot.timestamp.elapsed_seconds - carla_snapshot.timestamp.elapsed_seconds))
 
     def _update(self, frame_id, timestamp):
         """
@@ -347,6 +357,8 @@ class CarlaCyberBridge(CompatibleNode):
                 not self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
             return
         with self._expected_ego_vehicle_control_command_ids_lock:
+            print("Control callback, ego vehicle id is {}, and self._expected_ego_vehicle is {}"\
+                .format(ego_vehicle_id, self._expected_ego_vehicle_control_command_ids))
             if ego_vehicle_id in self._expected_ego_vehicle_control_command_ids:
                 self._expected_ego_vehicle_control_command_ids.remove(
                     ego_vehicle_id)
@@ -365,7 +377,8 @@ class CarlaCyberBridge(CompatibleNode):
         :return:
         """
         if cybercomp.ok():
-            self.timestamp = cybercomp.get_timestamp(carla_timestamp.elapsed_seconds, from_sec=True)
+            self.timestamp = cybercomp.get_timestamp(
+                carla_timestamp.elapsed_seconds, from_sec=True)
             self.clock_writer.write(Clock(clock=Time(secs=self.timestamp['secs'],
                                                      nsecs=self.timestamp['nsecs'])))
 
@@ -409,14 +422,12 @@ def main(args=None):
     carla_bridge = CarlaCyberBridge()
     executor.add_node(carla_bridge)
 
-    config_file = os.path.dirname(__file__) + "/config/settings.yaml"
+    config_file = os.path.dirname(__file__) + "/config/settings_control.yaml"
     carla_bridge.loginfo("The config file path is {}.".format(config_file))
 
     parameters = yaml.safe_load(open(config_file))['carla']
 
     # self.loginfo(parameters)
-
-
 
     carla_bridge.loginfo("Trying to connect to {host}:{port}".format(
         host=parameters['host'], port=parameters['port']))

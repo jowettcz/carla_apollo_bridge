@@ -9,6 +9,7 @@ carla:
   synchronous_mode_wait_for_vehicle_control_command: False
   fixed_delta_seconds: 0.05
   register_all_sensors: True
+  # town: '/apollo/cyber/carla_bridge/carla_cyber_bridge/sh_yidongzhidi_forward_v1_01-06-10-55.xodr'
   town: 'Town01'
   # configuration values for the ego vehicle
   ego_vehicle:

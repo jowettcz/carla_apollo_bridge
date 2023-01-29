@@ -15,18 +15,20 @@ world = client.get_world()
 #     sun_altitude_angle=50.0)
 # world.set_weather(weather)
 
-# get vehicle blueprint
-model3_bp = world.get_blueprint_library().find('vehicle.tesla.model3')
+# # get vehicle blueprint
+# model3_bp = world.get_blueprint_library().find('vehicle.tesla.model3')
 # model3_bp.set_attribute('color', '255,255,255')
 
-camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
+# camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
 
-# spawn vehicle(Actor)
-spawn_point = carla.Transform(carla.Location(x=74.24, y=204.85, z=2), carla.Rotation(pitch=0, yaw=180, roll=0))
-vehicle = world.spawn_actor(model3_bp, spawn_point)
+# # spawn vehicle(Actor)
+# # spawn_point = carla.Transform(carla.Location(x=74.24, y=204.85, z=2), carla.Rotation(pitch=0, yaw=180, roll=0))
+# spawn_point = carla.Transform(carla.Location(x=0.0, y=0.0, z=2), carla.Rotation(pitch=0, yaw=180, roll=0))
+# vehicle = world.spawn_actor(model3_bp, spawn_point)
 
-
-# vehicle.set_autopilot(True)
+# vehicle = world.get_actor(197)
+ego_vehicle = world.get_actor(204)
+ego_vehicle.set_autopilot(True)
 
 
 # # spawn camera

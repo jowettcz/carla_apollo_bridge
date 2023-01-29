@@ -17,7 +17,7 @@ position.
 /initialpose might be writed via RVIZ '2D Pose Estimate" button.
 """
 
-import cyber_compatibility as cybercomp
+import cyber_compatibility as roscomp
 from cyber_compatibility.node import CompatibleNode
 
 from geometry_msgs.msg import PoseWithCovarianceStamped, Pose
