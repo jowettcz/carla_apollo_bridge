@@ -422,7 +422,7 @@ def main(args=None):
     carla_bridge = CarlaCyberBridge()
     executor.add_node(carla_bridge)
 
-    config_file = os.path.dirname(__file__) + "/config/settings_control.yaml"
+    config_file = os.path.dirname(__file__) + "/config/settings.yaml"
     carla_bridge.loginfo("The config file path is {}.".format(config_file))
 
     parameters = yaml.safe_load(open(config_file))['carla']
