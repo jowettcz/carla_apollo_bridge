@@ -12,6 +12,8 @@ Classes to handle Carla lidars
 """
 
 import numpy
+from carla_common import constants
+
 
 from carla_cyber_bridge.sensor import Sensor, create_cloud
 from modules.drivers.proto.pointcloud_pb2 import PointXYZIT, PointCloud
@@ -65,7 +67,7 @@ class Lidar(Sensor):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/apollo/sensor/" + self.name
+        return constants.CHANNEL_SENSOR + self.name
 
     # pylint: disable=arguments-differ
     def sensor_data_updated(self, carla_lidar_measurement):
@@ -144,7 +146,7 @@ class SemanticLidar(Sensor):
                                             synchronous_mode=synchronous_mode)
 
         self.semantic_lidar_writer = node.new_writer(
-            "/apollo/sensor/lidar32/semantic/PointCloud2",
+            constants.CHANNEL_SENSOR + "lidar32/semantic/PointCloud2",
             PointCloud,
             qos_depth=10)
         self.listen()

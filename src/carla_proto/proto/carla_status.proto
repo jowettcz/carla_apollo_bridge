@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.cyber.carla_bridge.proto;
+package movex.cyber.carla_bridge.proto;
 
 message CarlaStatus {
   optional uint64 frame = 1;                   // frame number

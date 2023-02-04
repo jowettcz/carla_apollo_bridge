@@ -49,10 +49,10 @@ class CollisionSensor(Sensor):
                                               synchronous_mode=synchronous_mode,
                                               is_event_sensor=True)
 
-        # self.collision_writer = node.new_writer(self.get_topic_prefix(),
-        #                                         CarlaCollisionEvent,
-        #                                         qos_depth=10)
-        # self.listen()
+        self.collision_writer = node.new_writer(self.get_topic_prefix(),
+                                                CarlaCollisionEvent,
+                                                qos_depth=10)
+        self.listen()
 
     def destroy(self):
         super(CollisionSensor, self).destroy()
@@ -65,12 +65,12 @@ class CollisionSensor(Sensor):
         :param collision_event: carla collision event object
         :type collision_event: carla.CollisionEvent
         """
-        pass
+        print("collision event {}".format(collision_event))
         # collision_msg = CarlaCollisionEvent()
         # collision_msg.header = self.get_msg_header(timestamp=collision_event.timestamp)
         # collision_msg.other_actor_id = collision_event.other_actor.id
         # collision_msg.normal_impulse.x = collision_event.normal_impulse.x
         # collision_msg.normal_impulse.y = collision_event.normal_impulse.y
         # collision_msg.normal_impulse.z = collision_event.normal_impulse.z
-        #
+        
         # self.collision_writer.write(collision_msg)

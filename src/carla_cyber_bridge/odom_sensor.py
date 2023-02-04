@@ -9,6 +9,7 @@
 handle a odom sensor
 """
 
+from carla_common import constants
 from carla_cyber_bridge.pseudo_actor import PseudoActor
 
 from cyber.carla_bridge.carla_proto.proto.carla_odometry_pb2 import Odometry
@@ -41,7 +42,7 @@ class OdometrySensor(PseudoActor):
                                              parent=parent,
                                              node=node)
 
-        self.odometry_writer = node.new_writer("/apollo/sensor/odometry",  # carla odometry sensor
+        self.odometry_writer = node.new_writer(constants.CHANNEL_ODOMETRY,  # carla odometry sensor
                                                Odometry,
                                                qos_depth=10)
 

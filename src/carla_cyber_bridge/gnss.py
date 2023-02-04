@@ -11,6 +11,7 @@ Classes to handle Carla gnsss
 """
 
 import carla_common.transforms as trans
+from carla_common import constants
 
 from carla_cyber_bridge.sensor import Sensor
 
@@ -77,7 +78,7 @@ class Gnss(Sensor):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/apollo/sensor/" + self.name
+        return constants.CHANNEL_SENSOR + self.name
 
     def sensor_data_updated(self, carla_gnss_measurement):
         """

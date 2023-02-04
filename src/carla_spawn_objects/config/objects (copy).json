@@ -1,0 +1,37 @@
+{
+    "objects":
+    [
+        {
+            "type": "sensor.pseudo.traffic_lights",
+            "id": "traffic_lights"
+        },
+        {
+            "type": "sensor.pseudo.actor_list",
+            "id": "actor_list"
+        },
+        {
+            "type": "sensor.pseudo.opendrive_map",
+            "id": "map"
+        },
+        {
+            "type": "vehicle.tesla.model3",
+            "id": "ego_vehicle",
+            "spawn_point": {"x": 10.0, "y": 2.0, "z": 2.0, "roll": 0.0, "pitch": 0.0, "yaw": 180.0},
+            "sensors":
+            [
+                {
+                    "type": "sensor.pseudo.objects",
+                    "id": "obstacles"
+                },
+                {
+                    "type": "sensor.pseudo.odom",
+                    "id": "odometry"
+                },
+                {
+                    "type": "sensor.pseudo.speedometer",
+                    "id": "speedometer"
+                }
+            ]
+        }
+    ]
+}

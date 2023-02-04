@@ -9,6 +9,7 @@
 handle a opendrive sensor
 """
 
+from carla_common import constants
 from carla_cyber_bridge.pseudo_actor import PseudoActor
 
 from cyber.carla_bridge.carla_proto.proto.carla_basic_type_pb2 import StringValue
@@ -42,7 +43,7 @@ class OpenDriveSensor(PseudoActor):
         self.carla_map = carla_map
         self._map_writed = False
         self.map_writer = node.new_writer(
-            "/apollo/opendrive_map",
+            constants.CHANNEL_OPENDRIVE_MAP,
             StringValue,
             qos_depth=10)
 

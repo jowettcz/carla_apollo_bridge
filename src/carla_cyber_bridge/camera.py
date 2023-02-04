@@ -87,7 +87,7 @@ class Camera(Sensor):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/apollo/sensor/camera/" + self.name
+        return "/movex/sensor/camera/" + self.name
 
     def _build_camera_info(self):
         """

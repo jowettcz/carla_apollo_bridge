@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.cyber.carla_bridge.proto;
+package movex.cyber.carla_bridge.proto;
 
 import "cyber/carla_bridge/carla_proto/proto/carla_geometry.proto";
 import "modules/data/proto/frame.proto";
@@ -9,7 +9,7 @@ import "modules/common/proto/geometry.proto";
 
 message CarlaEgoVehicleControl {
 
-  optional apollo.common.Header header = 1;
+  optional movex.common.Header header = 1;
 
   // The CARLA vehicle control data
 
@@ -64,11 +64,11 @@ message CarlaEgoVehicleInfoWheel {
 };
 
 message CarlaEgoVehicleStatus {
-  optional apollo.common.Header header = 1;
+  optional movex.common.Header header = 1;
 
   optional float velocity = 2;
   optional Accel acceleration = 3;
-  optional apollo.common.Quaternion orientation = 4;
+  optional movex.common.Quaternion orientation = 4;
 
   // the current control values, as reported by Carla
   optional CarlaEgoVehicleControl control = 5;

@@ -280,10 +280,7 @@ class CarlaCyberBridge(CompatibleNode):
         execution loop for synchronous mode
         """
         while not self.shutdown.is_set():
-            # t1 = time.time()
             self.process_run_state()
-            # t2 = time.time()
-            # print("1. process_run_state cost               {} s".format(t2-t1))
             if self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
                 # fill list of available ego vehicles
                 self._expected_ego_vehicle_control_command_ids = []
@@ -292,10 +289,8 @@ class CarlaCyberBridge(CompatibleNode):
                         if isinstance(actor, EgoVehicle):
                             self._expected_ego_vehicle_control_command_ids.append(
                                 actor_id)
-                            self.loginfo("set {} as expected_ego_vehicle_control_commands_id".format(actor_id))
+                            # self.loginfo("set {} as expected_ego_vehicle_control_commands_id".format(actor_id))
             frame = self.carla_world.tick()
-            # t3 = time.time()
-            # print("2. carla_world.tick               {} s".format(t3-t2))
 
             world_snapshot = self.carla_world.get_snapshot()
 
@@ -307,9 +302,7 @@ class CarlaCyberBridge(CompatibleNode):
             # self.logdebug("Waiting for sensor data finished.")
             self.actor_factory.update_available_objects()
 
-            t4 = time.time()
-            # print("3. world snap and update                {} s".format(t4-t3))
-
+            # t4 = time.time()
             if self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
                 # wait for all ego vehicles to send a vehicle control command
                 if self._expected_ego_vehicle_control_command_ids:
@@ -318,7 +311,7 @@ class CarlaCyberBridge(CompatibleNode):
                                      "Missing command from actor ids {}".format(CarlaCyberBridge.VEHICLE_CONTROL_TIMEOUT,
                                                                                 self._expected_ego_vehicle_control_command_ids))
                     self._all_vehicle_control_commands_received.clear()
-            t5 = time.time()
+            # t5 = time.time()
             # print("4. wait for control command              {} s".format(t5-t4))
 
     def _carla_time_tick(self, carla_snapshot):

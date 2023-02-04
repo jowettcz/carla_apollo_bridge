@@ -16,6 +16,7 @@ import carla
 from carla_cyber_bridge.pseudo_actor import PseudoActor
 from carla_cyber_bridge.traffic_participant import TrafficParticipant
 from carla_common.transforms import carla_location_to_cyber_point, carla_rotation_to_cyber_quaternion
+from carla_common import constants
 
 from cyber.carla_bridge.carla_proto.proto.carla_marker_pb2 import ColorRGBA, Marker, MarkerList
 
@@ -81,10 +82,10 @@ class MarkerSensor(PseudoActor):
         self.world = world
         self.node = node
 
-        self.marker_writer = node.new_writer("/apollo" + self.get_topic_prefix(),
+        self.marker_writer = node.new_writer(constants.SYSTEM_PREFIX + self.get_topic_prefix(),
                                              MarkerList,
                                              qos_depth=10)
-        self.static_marker_writer = node.new_writer("/apollo" + self.get_topic_prefix() + "/static",
+        self.static_marker_writer = node.new_writer(constants.SYSTEM_PREFIX + self.get_topic_prefix() + "/static",
                                                     MarkerList,
                                                     qos_depth=1)
 

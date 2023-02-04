@@ -10,6 +10,7 @@ Classes to handle Carla imu sensor
 from transforms3d.euler import euler2quat
 
 import carla_common.transforms as trans
+from carla_common import constants
 
 from .sensor import Sensor
 
@@ -51,7 +52,7 @@ class ImuSensor(Sensor):
                                         synchronous_mode=synchronous_mode)
 
         # self.imu_writer = node.new_writer(self.get_topic_prefix(), Imu, qos_depth=10)
-        self.imu_writer = node.new_writer('/apollo/sensor/gnss/corrected_imu', CorrectedImu, qos_depth=20)
+        self.imu_writer = node.new_writer(constants.CHANNEL_SENSOR +  'gnss/corrected_imu', CorrectedImu, qos_depth=20)
         self.listen()
 
     def destroy(self):
@@ -64,7 +65,7 @@ class ImuSensor(Sensor):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/apollo/sensor/" + self.name
+        return constants.CHANNEL_SENSOR + self.name
 
     # pylint: disable=arguments-differ
     def sensor_data_updated(self, carla_imu_measurement):

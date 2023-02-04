@@ -9,6 +9,7 @@
 a sensor that reports the state of all traffic lights
 """
 
+from carla_common import constants
 from carla_cyber_bridge.pseudo_actor import PseudoActor
 from carla_cyber_bridge.traffic import TrafficLight
 
@@ -50,11 +51,11 @@ class TrafficLightsSensor(PseudoActor):
         self.traffic_light_actors = []
 
         self.traffic_lights_info_writer = node.new_writer(
-            "/apollo" + self.get_topic_prefix() + "/info",
+            constants.SYSTEM_PREFIX + self.get_topic_prefix() + "/info",
             CarlaTrafficLightInfoList,
             qos_depth=10)
         self.traffic_lights_status_writer = node.new_writer(
-            "/apollo" + self.get_topic_prefix() + "/status",
+            constants.SYSTEM_PREFIX + self.get_topic_prefix() + "/status",
             CarlaTrafficLightStatusList,
             qos_depth=10)
 

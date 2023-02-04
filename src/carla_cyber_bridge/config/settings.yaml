@@ -6,9 +6,9 @@ carla:
   timeout: 30
   passive: False
   synchronous_mode: True
-  synchronous_mode_wait_for_vehicle_control_command: False
-  fixed_delta_seconds: 0.05
-  register_all_sensors: True
+  synchronous_mode_wait_for_vehicle_control_command: True
+  fixed_delta_seconds: 0.02
+  register_all_sensors: False
   town: 'Town01'
   # configuration values for the ego vehicle
   ego_vehicle:

@@ -244,8 +244,8 @@ def main():
                 blueprint.set_attribute('role_name', 'autopilot')
 
             # spawn the cars and set their autopilot and light state all together
-            batch.append(SpawnActor(blueprint, transform)
-                .then(SetAutopilot(FutureActor, True, traffic_manager.get_port())))
+            # batch.append(SpawnActor(blueprint, transform)
+            #     .then(SetAutopilot(FutureActor, True, traffic_manager.get_port())))
 
         for response in client.apply_batch_sync(batch, synchronous_master):
             if response.error:
@@ -342,13 +342,13 @@ def main():
         print('spawned %d vehicles and %d walkers, press Ctrl+C to exit.' % (len(vehicles_list), len(walkers_list)))
 
         # Example of how to use Traffic Manager parameters
-        traffic_manager.global_percentage_speed_difference(30.0)
+        # traffic_manager.global_percentage_speed_difference(30.0)
 
-        while True:
-            if not args.asynch and synchronous_master:
-                world.tick()
-            else:
-                world.wait_for_tick()
+        # while True:
+        #     if not args.asynch and synchronous_master:
+        #         world.tick()
+        #     else:
+        #         world.wait_for_tick()
 
     finally:
 

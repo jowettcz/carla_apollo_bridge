@@ -32,7 +32,7 @@ class CarlaStatusWriter(object):
             self.fixed_delta_seconds = 0.
         self.frame = 0
 
-        self.carla_status_writer = self.node.new_writer("/apollo/carla/status", CarlaStatus, qos_depth=10)
+        self.carla_status_writer = self.node.new_writer("/movex/carla/status", CarlaStatus, qos_depth=10)
         self.write()
 
     def destroy(self):

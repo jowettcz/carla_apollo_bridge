@@ -12,6 +12,7 @@ Classes to handle Carla Radar
 
 import numpy as np
 
+from carla_common import constants
 from carla_cyber_bridge.sensor import Sensor, create_cloud
 
 from modules.drivers.proto.pointcloud_pb2 import PointXYZIT, PointCloud
@@ -63,7 +64,7 @@ class Radar(Sensor):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/apollo/sensor/" + self.name
+        return constants.CHANNEL_SENSOR + self.name
 
     def sensor_data_updated(self, carla_radar_measurement):
         """

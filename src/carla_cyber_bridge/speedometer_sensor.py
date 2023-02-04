@@ -10,7 +10,7 @@ handle a speedometer sensor
 """
 
 import numpy as np
-
+from carla_common import constants
 from carla_cyber_bridge.pseudo_actor import PseudoActor
 
 from cyber.carla_bridge.carla_proto.proto.carla_basic_type_pb2 import FloatValue
@@ -55,7 +55,7 @@ class SpeedometerSensor(PseudoActor):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/apollo/sensor/" + self.name
+        return constants.CHANNEL_SENSOR + self.name
 
     @staticmethod
     def get_blueprint_name():

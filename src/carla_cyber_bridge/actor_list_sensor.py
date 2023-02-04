@@ -43,7 +43,7 @@ class ActorListSensor(PseudoActor):
                                               parent=parent,
                                               node=node)
         self.actor_list = actor_list
-        self.actor_list_writer = node.new_writer("/apollo" + self.get_topic_prefix(),
+        self.actor_list_writer = node.new_writer("/movex" + self.get_topic_prefix(),
                                                  CarlaActorList,
                                                  qos_depth=10)
 

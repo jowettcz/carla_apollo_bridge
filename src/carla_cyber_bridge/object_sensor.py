@@ -8,7 +8,7 @@
 """
 handle a object sensor
 """
-
+from carla_common import constants
 from carla_cyber_bridge.pseudo_actor import PseudoActor
 from carla_cyber_bridge.vehicle import Vehicle
 from carla_cyber_bridge.walker import Walker
@@ -63,7 +63,7 @@ class ObjectSensor(PseudoActor):
         :return: the final topic name of this object
         :rtype: string
         """
-        return "/apollo/perception/" + self.name
+        return constants.CHANNEL_PERCEPTION + self.name
 
     @staticmethod
     def get_blueprint_name():

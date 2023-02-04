@@ -70,17 +70,10 @@ class CarlaSpawnObjects(CompatibleNode):
         self.spawn_object_service = self.new_client("/carla/spawn_object", SpawnObjectRequest, SpawnObjectResponse)
         self.destroy_object_service = self.new_client("/carla/destroy_object", DestroyObjectRequest, DestroyObjectResponse)
 
-    def set_ego_vehicle_as_autopilot(self, ego_vehicle_id):
-        # Create client and connected to the server
-        client = carla.Client("172.17.0.1", 2000)
-        client.set_timeout(30.0)
-        world = client.get_world()
-        ego_vehicle = world.get_actor(ego_vehicle_id)
-        ego_vehicle.set_autopilot(True)
-
     def spawn_object(self, spawn_object_request):
         response_id = -1
         response = self.call_service(self.spawn_object_service, spawn_object_request)
+        # print("spawn_object_service response = {}".response)
         response_id = response.id
         
         if response_id != -1:
@@ -143,80 +136,86 @@ class CarlaSpawnObjects(CompatibleNode):
         self.loginfo("All objects spawned.")
 
     def setup_vehicles(self, vehicles):
-        for vehicle in vehicles:
-            if self.spawn_sensors_only is True:
-                # spawn sensors of already spawned vehicles
-                try:
-                    carla_id = vehicle["carla_id"]
-                except KeyError as e:
-                    self.logerr(
-                        "Could not spawn sensors of vehicle {}, its carla ID is not known.".format(vehicle["id"]))
-                    break
-                # spawn the vehicle's sensors
-                self.setup_sensors(vehicle["sensors"], carla_id)
-            else:
-                spawn_object_request = SpawnObjectRequest()
-                spawn_object_request.type = vehicle["type"]
-                spawn_object_request.id = vehicle["id"]
-                spawn_object_request.attach_to = 0
-                spawn_object_request.random_pose = False
-
-                spawn_point = None
-
-                # check if there's a spawn_point corresponding to this vehicle
-                spawn_point_param = None  # self.get_param("spawn_point_" + vehicle["id"], None)
-                spawn_param_used = False
-                self.logdebug(spawn_point_param)
-                if (spawn_point_param is not None):
-                    # try to use spawn_point from parameters
-                    spawn_point = self.check_spawn_point_param(spawn_point_param)
-                    if spawn_point is None:
-                        self.logwarn("{}: Could not use spawn point from parameters, ".format(vehicle["id"]) +
-                                     "the spawn point from config file will be used.")
-                    else:
-                        self.loginfo("Spawn point from ros parameters")
-                        spawn_param_used = True
-
-                if "spawn_point" in vehicle and spawn_param_used is False:
-                    # get spawn point from config file
+        try:
+            for vehicle in vehicles:
+                if self.spawn_sensors_only is True:
+                    # spawn sensors of already spawned vehicles
                     try:
-                        spawn_point = self.create_spawn_point(
-                            vehicle["spawn_point"]["x"],
-                            vehicle["spawn_point"]["y"],
-                            vehicle["spawn_point"]["z"],
-                            vehicle["spawn_point"]["roll"],
-                            vehicle["spawn_point"]["pitch"],
-                            vehicle["spawn_point"]["yaw"]
-                        )
-                        self.loginfo("Spawn point from configuration file")
+                        carla_id = vehicle["carla_id"]
                     except KeyError as e:
-                        self.logerr("{}: Could not use the spawn point from config file, ".format(vehicle["id"]) +
-                                    "the mandatory attribute {} is missing, a random spawn point will be used".format(e))
+                        self.logerr(
+                            "Could not spawn sensors of vehicle {}, its carla ID is not known.".format(vehicle["id"]))
+                        break
+                    # spawn the vehicle's sensors
+                    self.setup_sensors(vehicle["sensors"], carla_id)
+                else:
+                    print("start to spawn vehicle {}...".format(vehicle))
+                    spawn_object_request = SpawnObjectRequest()
+                    spawn_object_request.type = vehicle["type"]
+                    spawn_object_request.id = vehicle["id"]
+                    spawn_object_request.attach_to = 0
+                    spawn_object_request.random_pose = False
+                    spawn_point = None
 
-                if spawn_point is None:
-                    # pose not specified, ask for a random one in the service call
-                    self.loginfo("Spawn point selected at random")
-                    spawn_point = Pose()  # empty pose
-                    spawn_object_request.random_pose = True
-
-                player_spawned = False
-                while not player_spawned and cybercomp.ok():
-                    spawn_object_request.transform.CopyFrom(spawn_point)
-                    response_id = self.spawn_object(spawn_object_request)
-                    if response_id != -1:
-                        player_spawned = True
-                        self.players.append(response_id)
-
-                        if spawn_object_request.id == "ego_vehicle":
-                            self.set_ego_vehicle_as_autopilot(response_id)
-                            # pass
-                        #Set up the sensors
+                    # check if there's a spawn_point corresponding to this vehicle
+                    spawn_point_param = None  # self.get_param("spawn_point_" + vehicle["id"], None)
+                    spawn_param_used = False
+                    
+                    self.logdebug(spawn_point_param)
+                    if (spawn_point_param is not None):
+                        # try to use spawn_point from parameters
+                        spawn_point = self.check_spawn_point_param(spawn_point_param)
+                        if spawn_point is None:
+                            self.logwarn("{}: Could not use spawn point from parameters, ".format(vehicle["id"]) +
+                                        "the spawn point from config file will be used.")
+                        else:
+                            self.loginfo("Spawn point from ros parameters")
+                            spawn_param_used = True
+                    if "spawn_point" in vehicle and spawn_param_used is False:
+                        # get spawn point from config file
                         try:
-                            self.setup_sensors(vehicle["sensors"], response_id)
-                        except KeyError:
-                            self.logwarn(
-                                "Object (type='{}', id='{}') has no 'sensors' field in his config file, none will be spawned.".format(spawn_object_request.type, spawn_object_request.id))
+                            spawn_point = self.create_spawn_point(
+                                vehicle["spawn_point"]["x"],
+                                vehicle["spawn_point"]["y"],
+                                vehicle["spawn_point"]["z"],
+                                vehicle["spawn_point"]["roll"],
+                                vehicle["spawn_point"]["pitch"],
+                                vehicle["spawn_point"]["yaw"]
+                            )
+                            self.loginfo("Spawn point from configuration file")
+                        except KeyError as e:
+                            self.logerr("{}: Could not use the spawn point from config file, ".format(vehicle["id"]) +
+                                        "the mandatory attribute {} is missing, a random spawn point will be used".format(e))
 
+                    if spawn_point is None:
+                        # pose not specified, ask for a random one in the service call
+                        self.loginfo("Spawn point selected at random")
+                        spawn_point = Pose()  # empty pose
+                        spawn_object_request.random_pose = True
+
+                    player_spawned = False
+                    while not player_spawned and cybercomp.ok():
+                        spawn_object_request.transform.CopyFrom(spawn_point)
+                        response_id = self.spawn_object(spawn_object_request)
+                        if response_id != -1:
+                            player_spawned = True
+                            self.players.append(response_id)
+
+                            # if spawn_object_request.id == "ego_vehicle":
+                            #     self.set_ego_vehicle_as_autopilot(response_id)
+                            # Set up the sensors
+                            try:
+                                self.setup_sensors(vehicle["sensors"], response_id)
+                            except KeyError:
+                                self.logwarn(
+                                    "Object (type='{}', id='{}') has no 'sensors' field in his config file, none will be spawned.".format(spawn_object_request.type, spawn_object_request.id))
+                    print("success to spawn vehicle {}...".format(vehicle))
+        except Exception as e:
+            print(str(e))
+        except:
+            print("Unexpected error:".format(sys.exc_info()[0]))
+            raise
+                
     def setup_sensors(self, sensors, attached_vehicle_id=None):
         """
         Create the sensors defined by the user and attach them to the vehicle

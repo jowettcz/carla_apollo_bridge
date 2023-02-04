@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package apollo.cyber.carla_bridge.proto;
+package movex.cyber.carla_bridge.proto;
 
 import "modules/common/proto/header.proto";
 import "modules/common/proto/geometry.proto";
@@ -38,17 +38,17 @@ message Marker {
     DELETEALL = 3;
   }
 
-  optional apollo.common.Header header = 1;
+  optional movex.common.Header header = 1;
   optional string ns = 2;
   optional int32 id = 3;
   optional int32 type = 4;
   optional int32 action = 5;
-  optional apollo.localization.Pose pose = 6;
+  optional movex.localization.Pose pose = 6;
   optional Vector3 scale = 7;
   optional ColorRGBA color = 8;
   optional int32 lifetime = 9;
   optional bool frame_locked = 10;
-  repeated apollo.common.Point3D points = 11;
+  repeated movex.common.Point3D points = 11;
   repeated ColorRGBA colors = 12;
   optional string text = 13;
   optional string mesh_resource = 14;
